@@ -14,7 +14,6 @@ The project covers the complete data workflow, from data preparation and databas
 
 - **Python:** Pandas, NumPy, Matplotlib, Seaborn
 - **Database:** Microsoft SQL Server
-- **Data Visualization:** Streamlit, Plotly
 - **Business Intelligence:** Power BI, Tableau
 - **Development Tools:** Jupyter Notebook, VS Code, Git, GitHub
 

@@ -58,59 +58,23 @@ Sales per trading day dropped from **≈5,150 EGP/day (Dec 2025) to ≈1,340 EGP
 cosmetics_store_rebuild/
 ├── data/
 │   ├── raw/                             # 8 raw staging CSVs (extracted from POS Excel)
-│   │   ├── raw_sales_invoices.csv
-│   │   ├── raw_sales_items.csv
-│   │   ├── raw_purchase_invoices.csv
-│   │   ├── raw_purchase_items.csv
-│   │   ├── raw_sales_returns_invoices.csv
-│   │   ├── raw_sales_returns_items.csv
-│   │   ├── raw_products.csv
-│   │   └── raw_accounts.csv
-│   └── processed/                       # 8 production-cleaned and validated CSVs
-│       ├── cleaned_sales_invoices.csv
-│       ├── cleaned_sales_items.csv
-│       ├── cleaned_purchase_invoices.csv
-│       ├── cleaned_purchase_items.csv
-│       ├── cleaned_sales_returns_invoices.csv
-│       ├── cleaned_sales_returns_items.csv
-│       ├── cleaned_products.csv
-│       └── cleaned_accounts.csv
+│   └── processed/                       # 8 cleaned and validated CSVs
 ├── scripts/
-│   ├── 01_extract_excel_to_csv.py       # Excel block unpacking with strict assertion tests
-│   ├── finalize_cleaned_data.py         # Text cleaning, dual-taxonomy & account classification
+│   ├── 01_extract_excel_to_csv.py       # Extraction & assertion checks
+│   ├── finalize_cleaned_data.py         # Data cleaning, taxonomy & account segmentation
 │   └── parse_utils.py                   # Parsing helpers, block unpacking & date validation
 ├── sql_server/
-│   ├── schema/
-│   │   ├── 01_create_database.sql       # Database creation script
-│   │   ├── 02_create_tables_and_constraints.sql # DDL tables, PKs, FKs, default constraints
-│   │   ├── 03_create_indexes.sql        # Nonclustered performance indexes
-│   │   └── 04_create_views.sql          # Analytical views (Net KPIs, diagnostic views)
-│   ├── etl/
-│   │   └── load_data_to_sql.py          # PyODBC transactional loader with pre-commit checks
+│   ├── schema/                          # Table DDL, PKs, FKs, indexes, and views
+│   ├── etl/                             # load_data_to_sql.py (ETL loader with pre-commit checks)
 │   └── queries/                         # 12 analytical & diagnostic T-SQL queries
-│       ├── 01_monthly_financial_trends.sql
-│       ├── 02_hourly_shopping_patterns.sql
-│       ├── 03_category_performance_and_margins.sql
-│       ├── 04_pareto_80_20_products.sql
-│       ├── 05_internal_accounts_impact.sql
-│       ├── 06_customer_segmentation_rfm.sql
-│       ├── 07_inventory_valuation_and_anomalies.sql
-│       ├── 08_sales_returns_deepdive.sql
-│       ├── 09_hero_and_dead_stock_products.sql
-│       ├── 10_basket_size_and_aov_distribution.sql
-│       ├── 11_decline_diagnosis_traffic_vs_ticket.sql
-│       └── 12_stock_availability_and_restock_lift.sql
 ├── notebooks/
 │   └── cosmetics_data_analysis.ipynb    # 55 cells with embedded tables and 7 charts
-├── reports/
-│   ├── uncertain_products_review.csv    # Manual catalog governance review (252 items)
-│   └── missing_by_column.csv            # Missing values audit log
 └── documentation/
-    ├── 01_Project_Planning_and_Management.pdf # Project proposal, timeline, and Team 5 charter
-    ├── 02_Literature_Review.pdf         # Retail analytics & inventory management literature review
-    ├── 03_Requirements_Gathering.pdf    # Stakeholder analysis, user stories, requirements
-    ├── Cosmetics Store Data Analysis - Full Project Documentation.pdf # Full project documentation
-    └── System_Analysis_and_Design.md    # Comprehensive system analysis & physical schema design
+    ├── 01_Project_Planning_and_Management.pdf                         # Project proposal, timeline & charter
+    ├── 02_Literature_Review.pdf                                       # Retail analytics & inventory literature
+    ├── 03_Requirements_Gathering.pdf                                  # Stakeholder analysis & user stories
+    ├── Cosmetics Store Data Analysis - Full Project Documentation.pdf # Full project documentation report
+    └── System_Analysis_and_Design.md                                  # System analysis & physical schema design
 ```
 
 ---

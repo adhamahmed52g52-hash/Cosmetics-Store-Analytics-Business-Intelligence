@@ -1,98 +1,132 @@
 # Cosmetics Store Analytics & Business Intelligence
-
-An end-to-end Data Analytics and Business Intelligence project focused on analyzing cosmetics store operations, including sales, purchases, returns, products, and inventory.
-
-The project uses Python for data processing and analysis, SQL Server for data storage and management, and interactive dashboards for presenting business insights.
-
-## Project Overview
-
-The main goal of this project is to transform raw cosmetics store data into meaningful business insights that help understand business performance, track key metrics, and identify areas that need attention.
-
-The project covers the complete data workflow, from data preparation and database design to analysis and interactive visualization.
-
-## Technologies Used
-
-- **Python:** Pandas, NumPy, Matplotlib, Seaborn
-- **Database:** Microsoft SQL Server
-- **Business Intelligence:** Power BI, Tableau
-- **Development Tools:** Jupyter Notebook, VS Code, Git, GitHub
-
-## Project Workflow
-
-1. **Data Preparation:** Loading, cleaning, validating, and standardizing the source datasets using Python.
-2. **Exploratory Data Analysis (EDA):** Exploring the data and understanding sales, purchases, returns, and inventory.
-3. **Database Design:** Building a relational database using SQL Server with primary keys, foreign keys, and indexes.
-4. **Data Analysis:** Calculating business KPIs and analyzing operational performance.
-5. **Dashboard Development:** Building interactive visualizations to present the results and support business decisions.
-
-## Database Structure
-
-The SQL Server database contains 8 main tables organized around business transactions and dimensions.
-
-The structure includes:
-
-- Account dimension
-- Product dimension
-- Sales invoices and sales details
-- Purchase invoices and purchase details
-- Return invoices and return details
-
-Primary and foreign key relationships are used to maintain data integrity.
-
-## Key Business Metrics
-
-The following metrics were calculated from the processed datasets:
-
-| Metric | Value |
-|---|---:|
-| Gross Sales | 978,248.29 EGP |
-| Net Sales | 964,468.51 EGP |
-| Gross Profit | 198,590.41 EGP |
-| Net Profit | 195,570.28 EGP |
-| Profit Margin | 20.30% |
-| Total Orders | 5,505 |
-| Units Sold | 12,521.93 |
-| Average Order Value | 177.70 EGP |
-| Total Returns | 127 |
-| Inventory Valuation | 322,251.11 EGP |
-
-## Key Findings
-
-- Gross profit margin reached approximately 20.30%.
-- Returns accounted for approximately 1.41% of sales.
-- Inventory analysis identified 84 products with negative stock quantities, requiring further investigation.
-- The analysis provides an overview of sales performance, product activity, profitability, and inventory conditions.
-
-## Interactive Dashboard
-
-The project includes a multi-page interactive dashboard built with Streamlit and Plotly.
-
-It supports data exploration and business performance monitoring through interactive charts, KPI cards, and filters.
-
-The dashboard supports loading data from processed CSV files or SQL Server.
-
-## Data Quality & Validation
-
-Data processing and database validation included:
-
-- Checking missing and invalid values.
-- Standardizing data formats and classifications.
-- Validating primary and foreign key relationships.
-- Checking for orphan records.
-- Verifying processed datasets and database records.
-
-## Project Structure
-
-The project is organized into separate folders for data, notebooks, database scripts, ETL processes, and dashboard development.
-
-## Future Improvements
-
-- Expand business analysis and reporting.
-- Add more advanced SQL queries and analytical views.
-- Improve inventory monitoring and anomaly detection.
-- Enhance dashboard performance and user experience.
+**Digital Egypt Pioneers Initiative (DEPI) — Data Analytics Track**  
+**Project:** Cosmetics Store Rebuild  
+**Database:** Microsoft SQL Server (`cosmetics_store`)  
 
 ---
 
-**Project Type:** Data Analytics & Business Intelligence  
-**Focus:** Retail Analytics | Sales Analysis | Profitability | Inventory Management
+## 1. Data Overview
+
+This project analyzes point-of-sale (POS), purchasing, returns, and inventory datasets from a retail cosmetics store in Egypt covering a 10-month period (**28 November 2025 to 14 September 2026**).
+
+| Dataset | Records Count | Key Fields | Description |
+| :--- | :---: | :--- | :--- |
+| **Sales Invoices** | 5,505 rows | `invoice_no`, `invoice_date`, `sale_type`, `final_total`, `profit` | Transaction headers (5,481 retail sales + 24 non-retail transactions). |
+| **Sales Items** | 10,891 rows | `invoice_no`, `item_code`, `qty`, `price`, `unit_cost`, `line_final` | Line items sold across invoices. |
+| **Purchase Invoices** | 32 rows | `invoice_no`, `purchase_date`, `acct_no`, `final_total` | Supplier inventory replenishment orders totaling **1,118,614.71 EGP**. |
+| **Purchase Items** | 1,658 rows | `invoice_no`, `item_code`, `qty`, `price`, `line_final` | Goods and quantities received into store inventory. |
+| **Sales Returns** | 127 rows | `return_invoice_no`, `return_date`, `original_invoice_no`, `final_total` | Customer returns and refunds totaling **-13,779.78 EGP**. |
+| **Return Items** | 157 rows | `return_invoice_no`, `item_code`, `qty`, `price`, `line_final` | Individual items returned by customers. |
+| **Products Catalog** | 1,437 SKUs | `item_code`, `item_name`, `product_category`, `total_qty`, `stock_cost_valuation` | Store catalog classified across 7 departments with net valuation of **322,251.11 EGP**. |
+| **Accounts Master** | 37 accounts | `acct_no`, `acct_name`, `nature`, `account_classification`, `is_internal` | Suppliers (15), customers (14), staff (3), partners (2), expenses (2), other (1). |
+
+---
+
+## 2. Verified Financial Numbers
+
+The analysis distinguishes between total POS gross bookings and true core retail performance:
+
+- **Gross Book Sales (All 5,505 Invoices):** **978,248.29 EGP** | Profit: **198,590.41 EGP** | Margin: **20.30%**
+- **Excluded Non-Retail Transactions (24 Invoices):** **62,482.00 EGP**  
+  *(Internal partner withdrawals, supplier barter settlements, staff payroll, and store expenses)*
+- **Retail Gross Sales (5,481 Invoices):** **915,766.29 EGP** | Profit: **195,554.19 EGP**
+- **Sales Returns (127 Invoices):** **-13,779.78 EGP** | Return Rate: **1.50%**
+- **Retail Net Sales:** **901,986.51 EGP (~902K EGP)**
+- **Retail Net Profit:** **192,534.06 EGP (~192.5K EGP)**
+- **Retail Net Margin:** **21.35%**
+
+---
+
+## 3. Main Business Findings
+
+### Why Did Daily Sales Fall by 74%?
+Sales per trading day dropped from **≈5,150 EGP/day (Dec 2025) to ≈1,340 EGP/day (Aug 2026)**.
+1. **Traffic / Footfall Collapse:** Daily invoices fell by **65.2%** (from 29.3 to 10.2 orders/day). Over **78%** of the revenue drop was fewer visiting customers.
+2. **Stable Prices:** Average unit selling price stayed flat (**72.9 EGP → 73.7 EGP, +1.1%**), confirming customers did not leave due to price increases.
+3. **Assortment Depletion:** Stock replenishment stopped (purchased units dropped from 11,536 in Nov to 3 in Aug). In-stock catalogue availability plunged from **97.9% to 63.8%**, leaving 76 of the top-100 sellers out of stock.
+4. **Restock Sales Lift:** When products were restocked ($\ge 20$ SKUs), their sales jumped by **+108%, +78%, and +129%** in the following 45 days.
+
+### Shopping Cycles
+- **Late-Night Peak:** The hours from **20:00 to 04:00** account for **67.20%** of total revenue (**657,337.39 EGP**).
+- **Friday Peak:** Friday is the highest revenue day, bringing in **22.41%** of weekly sales (**219,197.20 EGP**).
+
+---
+
+## 4. Project Structure
+
+```text
+cosmetics_store_rebuild/
+├── data/
+│   ├── raw/                             # 8 raw staging CSVs (extracted from POS Excel)
+│   │   ├── raw_sales_invoices.csv
+│   │   ├── raw_sales_items.csv
+│   │   ├── raw_purchase_invoices.csv
+│   │   ├── raw_purchase_items.csv
+│   │   ├── raw_sales_returns_invoices.csv
+│   │   ├── raw_sales_returns_items.csv
+│   │   ├── raw_products.csv
+│   │   └── raw_accounts.csv
+│   └── processed/                       # 8 production-cleaned and validated CSVs
+│       ├── cleaned_sales_invoices.csv
+│       ├── cleaned_sales_items.csv
+│       ├── cleaned_purchase_invoices.csv
+│       ├── cleaned_purchase_items.csv
+│       ├── cleaned_sales_returns_invoices.csv
+│       ├── cleaned_sales_returns_items.csv
+│       ├── cleaned_products.csv
+│       └── cleaned_accounts.csv
+├── scripts/
+│   ├── 01_extract_excel_to_csv.py       # Excel block unpacking with strict assertion tests
+│   ├── finalize_cleaned_data.py         # Text cleaning, dual-taxonomy & account classification
+│   └── parse_utils.py                   # Parsing helpers, block unpacking & date validation
+├── sql_server/
+│   ├── schema/
+│   │   ├── 01_create_database.sql       # Database creation script
+│   │   ├── 02_create_tables_and_constraints.sql # DDL tables, PKs, FKs, default constraints
+│   │   ├── 03_create_indexes.sql        # Nonclustered performance indexes
+│   │   └── 04_create_views.sql          # Analytical views (Net KPIs, diagnostic views)
+│   ├── etl/
+│   │   └── load_data_to_sql.py          # PyODBC transactional loader with pre-commit checks
+│   └── queries/                         # 12 analytical & diagnostic T-SQL queries
+│       ├── 01_monthly_financial_trends.sql
+│       ├── 02_hourly_shopping_patterns.sql
+│       ├── 03_category_performance_and_margins.sql
+│       ├── 04_pareto_80_20_products.sql
+│       ├── 05_internal_accounts_impact.sql
+│       ├── 06_customer_segmentation_rfm.sql
+│       ├── 07_inventory_valuation_and_anomalies.sql
+│       ├── 08_sales_returns_deepdive.sql
+│       ├── 09_hero_and_dead_stock_products.sql
+│       ├── 10_basket_size_and_aov_distribution.sql
+│       ├── 11_decline_diagnosis_traffic_vs_ticket.sql
+│       └── 12_stock_availability_and_restock_lift.sql
+├── notebooks/
+│   └── cosmetics_data_analysis.ipynb    # 55 cells with embedded tables and 7 charts
+├── reports/
+│   ├── uncertain_products_review.csv    # Manual catalog governance review (252 items)
+│   └── missing_by_column.csv            # Missing values audit log
+└── documentation/
+    ├── 01_Project_Planning_and_Management.pdf # Project proposal, timeline, and Team 5 charter
+    ├── 02_Literature_Review.pdf         # Retail analytics & inventory management literature review
+    ├── 03_Requirements_Gathering.pdf    # Stakeholder analysis, user stories, requirements
+    ├── Cosmetics Store Data Analysis - Full Project Documentation.pdf # Full project documentation
+    └── System_Analysis_and_Design.md    # Comprehensive system analysis & physical schema design
+```
+
+---
+
+## 5. How to Run
+
+```bash
+# 1. Extract raw POS Excel workbooks to CSV
+python scripts/01_extract_excel_to_csv.py
+
+# 2. Clean data, apply taxonomy, and segment accounts
+python scripts/finalize_cleaned_data.py
+
+# 3. Load tables into SQL Server and run pre-commit tests
+python sql_server/etl/load_data_to_sql.py
+
+# 4. Open the analysis notebook
+jupyter notebook notebooks/cosmetics_data_analysis.ipynb
+```

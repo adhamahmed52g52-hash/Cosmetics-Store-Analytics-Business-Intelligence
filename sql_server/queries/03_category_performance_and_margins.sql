@@ -1,78 +1,75 @@
--- ******************************************************
---                         CTE
--- ******************************************************
+-- *****************************************************************************
+-- 03_category_performance_and_margins.sql
+-- تقرير أداء أقسام المنتجات وهوامش الربحية والتصنيف المزدوج (Category & Scope)
+-- *****************************************************************************
 
 use cosmetics_store;
 go
 
---1) أداء أقسام المنتجات Category والإيرادات وهوامش الربح
----------------------------------------------
-with CategoryMetrics as ( --> CTE بنجمع فيه أداء كل قسم من بنود المبيعات
+-- 1) أداء الأقسام التجميلية الرئيسية لصافي مبيعات التجزئة (بعد خصم المرتجعات)
+--------------------------------------------------------------------------------
+with CategoryMetrics as ( --> CTE بنجمع فيه أداء كل قسم تجميلي من أسطر المبيعات والمرتجع الموحدة
     select 
-        p.product_category as [Category],
-        count(distinct s.invoice_no) as [DistinctInvoices], --> Distinct عشان نعد الفواتير الفريدة اللي اشترت من القسم ده بدون تكرار
-        sum(s.qty) as [UnitsSold],
-        sum(s.line_final) as [CategoryRevenue],
-        sum(s.profit) as [CategoryProfit]
-    from dbo.FactSalesItem as s
-    inner join dbo.DimProduct as p
-        on s.item_code = p.item_code --> ربط بند المبيعات بكتالوج الأصناف
-    group by p.product_category
+        f.product_category as [Category], --> اسم القسم التجميلي
+        count(distinct f.doc_no) as [DistinctInvoicesCount], --> عدد الفواتير الفريدة التي اشترت من هذا القسم
+        sum(f.qty_signed) as [NetUnitsSold], --> صافي عدد القطع المباعة بعد خصم المرتجع
+        sum(f.revenue_signed) as [NetRevenue], --> صافي إيراد القسم بعد خصم المرتجع
+        sum(f.profit_signed) as [NetProfit] --> صافي أرباح القسم بعد خصم المرتجع
+    from dbo.vw_FactSalesLines f
+    where f.is_retail_sale = 1 --> مبيعات التجزئة فقط
+    group by f.product_category
 ),
-TotalSales as (
-    select sum(line_final) as [OverallRevenue] from dbo.FactSalesItem
+TotalRetail as ( --> CTE إجمالي مبيعات المتجر الصافية لحساب الحصص النسبية
+    select sum(revenue_signed) as [TotalRetailRevenue]
+    from dbo.vw_FactSalesLines
+    where is_retail_sale = 1
 )
 select 
-    c.[Category],
-    c.[DistinctInvoices],
-    c.[UnitsSold],
-    c.[CategoryRevenue],
-    round(c.[CategoryRevenue] / t.[OverallRevenue] * 100.0, 2) as [RevenueSharePct],
-    c.[CategoryProfit],
-    round(c.[CategoryProfit] / nullif(c.[CategoryRevenue], 0) * 100.0, 2) as [ProfitMarginPct],
-    round(c.[CategoryRevenue] / nullif(c.[UnitsSold], 0), 2) as [AvgPricePerUnit] --> متوسط سعر بيع القطعة في القسم
-from CategoryMetrics as c
-cross join TotalSales as t
-order by c.[CategoryRevenue] desc;
+    c.[Category] as [ProductCategory], --> القسم التجميلي
+    c.[DistinctInvoicesCount] as [DistinctOrders], --> عدد الفواتير التي اشترت من القسم
+    c.[NetUnitsSold] as [NetUnitsSold], --> صافي القطع المباعة
+    c.[NetRevenue] as [NetRevenue], --> صافي إيراد القسم بالجنيه
+    round(c.[NetRevenue] / nullif(t.[TotalRetailRevenue], 0) * 100.0, 2) as [RevenueContributionPct], --> مساهمة القسم في إجمالي مبيعات المحل
+    c.[NetProfit] as [NetProfit], --> صافي أرباح القسم بالجنيه
+    round(c.[NetProfit] / nullif(c.[NetRevenue], 0) * 100.0, 2) as [ProfitMarginPct], --> نسبة مجمل الربح للقسم
+    round(c.[NetRevenue] / nullif(c.[NetUnitsSold], 0), 2) as [AveragePricePerUnit] --> متوسط سعر بيع القطعة في هذا القسم
+from CategoryMetrics c
+cross join TotalRetail t
+order by c.[NetRevenue] desc; --> ترتيب الأقسام من الأكثر إيراداً للأقل
 go
 
----------------------------------------------
---2) تحليل نطاقات المنتجات Product Scope والمبيعات والكتالوج
----------------------------------------------
-with CatalogScope as ( --> CTE بنحسب فيه عدد أصناف الكتالوج لكل نطاق
+-- 2) تحليل نطاقات المنتجات (Product Scope) والمخزون والنشاط البيعي
+--------------------------------------------------------------------------------
+with CatalogScopeMetrics as ( --> CTE بنحسب فيه عدد الأصناف وقيمة المخزون لكل نطاق بالكتالوج
     select 
-        product_scope as [ProductScope],
-        count(item_code) as [CatalogSKUs]
+        product_scope as [ProductScope], --> نطاق المنتج (Beauty, Fashion, Personal Care, Packaging)
+        count(item_code) as [TotalCatalogSKUs], --> إجمالي عدد أصناف الكتالوج
+        sum(stock_cost_valuation) as [InventoryCostValuation] --> إجمالي قيمة المخزون الحالي بالتكلفة
     from dbo.DimProduct
     group by product_scope
 ),
-SoldItems as ( --> CTE بنجمع فيه المبيعات الفعلية لكل نطاق
+SalesScopeMetrics as ( --> CTE بنجمع فيه المبيعات الفعلية لكل نطاق منتجات
     select 
-        p.product_scope as [ProductScope],
-        count(distinct s.item_code) as [ActiveSoldSKUs],
-        sum(s.qty) as [UnitsSold],
-        sum(s.line_final) as [ScopeRevenue],
-        sum(s.profit) as [ScopeProfit]
-    from dbo.FactSalesItem as s
-    inner join dbo.DimProduct as p
-        on s.item_code = p.item_code
-    group by p.product_scope
-),
-TotalStoreSales as (
-    select sum(line_final) as [TotalRevenue] from dbo.FactSalesItem
+        f.product_scope as [ProductScope],
+        count(distinct f.item_code) as [ActiveSellingSKUs], --> عدد الأصناف التي بيع منها بالفعل
+        sum(f.qty_signed) as [NetUnitsSold], --> صافي عدد القطع المباعة
+        sum(f.revenue_signed) as [NetRevenue], --> صافي الإيراد
+        sum(f.profit_signed) as [NetProfit] --> صافي الربح
+    from dbo.vw_FactSalesLines f
+    where f.is_retail_sale = 1
+    group by f.product_scope
 )
 select 
-    c.[ProductScope],
-    c.[CatalogSKUs],
-    isnull(s.[ActiveSoldSKUs], 0) as [ActiveSoldSKUs],
-    isnull(s.[UnitsSold], 0) as [UnitsSold],
-    isnull(s.[ScopeRevenue], 0) as [ScopeRevenue],
-    round(isnull(s.[ScopeRevenue], 0) / t.[TotalRevenue] * 100.0, 2) as [RevenueSharePct],
-    isnull(s.[ScopeProfit], 0) as [ScopeProfit],
-    round(isnull(s.[ScopeProfit], 0) / nullif(s.[ScopeRevenue], 0) * 100.0, 2) as [MarginPct]
-from CatalogScope as c
-left join SoldItems as s
-    on c.[ProductScope] = s.[ProductScope] --> left join عشان نجيب كل نطاقات الكتالوج حتى لو متباعتش
-cross join TotalStoreSales as t
-order by ScopeRevenue desc;
+    cs.[ProductScope] as [ProductScope], --> نطاق المنتجات
+    cs.[TotalCatalogSKUs] as [CatalogSKUCount], --> عدد الأصناف المسجلة في الكتالوج
+    isnull(ss.[ActiveSellingSKUs], 0) as [ActiveSellingSKUs], --> عدد الأصناف النشطة بيعياً
+    round(isnull(ss.[ActiveSellingSKUs], 0) * 100.0 / nullif(cs.[TotalCatalogSKUs], 0), 2) as [AssortmentUtilizationPct], --> نسبة استغلال الكتالوج
+    isnull(ss.[NetUnitsSold], 0) as [NetUnitsSold], --> صافي القطع المباعة
+    isnull(ss.[NetRevenue], 0) as [NetRevenue], --> صافي الإيراد
+    isnull(ss.[NetProfit], 0) as [NetProfit], --> صافي الربح
+    round(isnull(ss.[NetProfit], 0) / nullif(ss.[NetRevenue], 0) * 100.0, 2) as [ProfitMarginPct], --> هامش الربح للنطاق
+    cs.[InventoryCostValuation] as [InventoryValuationAtCost] --> قيمة رأس المال المجمد في المخزون
+from CatalogScopeMetrics cs
+left join SalesScopeMetrics ss on cs.[ProductScope] = ss.[ProductScope]
+order by NetRevenue desc;
 go

@@ -58,7 +58,7 @@ def load_table(cursor, table_name, df, columns, int_columns=None):
     placeholders = ", ".join(["?"] * len(columns))
     sql_query = f"INSERT INTO dbo.{table_name} ({', '.join(columns)}) VALUES ({placeholders})"
     cursor.executemany(sql_query, records)
-    print(f"Loaded {table_name:<26}: {len(records):,} rows inserted.")
+    print(f"Loaded {table_name:<26}: {len(records):,} rows inserted")
 
 
 def generate_dim_date(cursor):
@@ -100,7 +100,7 @@ def generate_dim_date(cursor):
     cursor.execute(dim_date_sql)
     cursor.execute("SELECT COUNT(*) FROM dbo.DimDate;")
     count_val = cursor.fetchone()[0]
-    print(f"Generated DimDate table with {count_val} calendar days.")
+    print(f"Generated DimDate table with {count_val} calendar days")
 
 
 def log_missing_invoices(cursor):
@@ -133,7 +133,7 @@ def log_missing_invoices(cursor):
     cursor.execute(missing_sql)
     cursor.execute("SELECT COUNT(*) FROM dbo.MissingInvoicesLog;")
     count_val = cursor.fetchone()[0]
-    print(f"Logged {count_val} sequence gaps in MissingInvoicesLog.")
+    print(f"Logged {count_val} sequence gaps in MissingInvoicesLog")
 
 
 def rebuild_database_data(cursor):
@@ -245,7 +245,7 @@ def rebuild_database_data(cursor):
     print("Creating performance indexes and analytical views")
     run_sql_file(cursor, schema_sql_dir / "03_create_indexes.sql")
     run_sql_file(cursor, schema_sql_dir / "04_create_views.sql")
-    print("Indexes and analytical views created successfully.")
+    print("Indexes and analytical views created successfully")
 
 
 def run_pre_commit_validations(cursor):
@@ -286,7 +286,7 @@ def run_pre_commit_validations(cursor):
         if abs(actual_val - expected_val) > 0.05:
             errors.append(f"Financial check failed on {name}: {actual_val} != {expected_val}")
         else:
-            print(f"Verified {name:<26}: {actual_val:>12,.2f} EGP (Matches benchmark)")
+            print(f"Verified {name:<26}: {actual_val:>12,.2f} EGP")
 
     # 3. التأكد من خلو الجداول من أي سجلات يتيمة
     fk_queries = [

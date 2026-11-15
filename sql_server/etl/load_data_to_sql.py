@@ -1,12 +1,8 @@
-"""
-load_data_to_sql.py
-"""
-
 import sys  #--> sys.exit() --> لإيقاف تشغيل البرنامج عند ظهور خطأ
 import os  #--> os.getenv() --> لقراءة إعدادات السيرفر من بيئة التشغيل
 from pathlib import Path  #--> Path() --> للتعامل مع مسارات الملفات والمجلدات
-import numpy as np  #--> numpy --> لمعالجة المصفوفات والقيم الفارغة
-import pandas as pd  #--> pandas --> لقراءة ومعالجة جداول البيانات DataFrames
+import numpy as np  
+import pandas as pd  
 import pyodbc  #--> pyodbc --> للاتصال المباشر بقاعدة بيانات SQL Server
 
 # إعداد المسارات ومعايير الاتصال
@@ -28,9 +24,7 @@ sql_connection_string = (
 
 
 def open_database_connection():
-    """
-    فتح الاتصال بقاعدة البيانات وتفعيل ميزة الإدخال السريع
-    """
+
     db_connection = pyodbc.connect(sql_connection_string, autocommit=False)  #--> تعطيل الحفظ التلقائي لحماية المعاملات
     db_cursor = db_connection.cursor()  #--> إنشاء مؤشر الأوامر
     db_cursor.fast_executemany = True  #--> تفعيل الإدخال السريع للبيانات
@@ -38,9 +32,7 @@ def open_database_connection():
 
 
 def execute_sql_script_file(db_cursor, sql_file_path: Path):
-    """
-    قراءة وتنفيذ ملف SQL مقسم إلى دفعات عبر أمر GO
-    """
+
     with open(sql_file_path, "r", encoding="utf-8") as file_handle:
         script_content = file_handle.read()
 
@@ -58,9 +50,6 @@ def execute_sql_script_file(db_cursor, sql_file_path: Path):
 
 
 def insert_dataframe_into_sql_table(db_cursor, table_name, columns, df, integer_columns=None):
-    """
-    تجهيز وإدخال بيانات DataFrame في جدول SQL المحدد
-    """
     int_col_set = set(integer_columns or [])
     records = []
 
@@ -75,16 +64,14 @@ def insert_dataframe_into_sql_table(db_cursor, table_name, columns, df, integer_
                 cleaned_row.append(cell_val)
         records.append(tuple(cleaned_row))
 
-    placeholders = ", ".join(["?"] * len(columns))  #--> علامات الاستفهام المعيارية
+    placeholders = ", ".join(["?"] * len(columns))  
     sql_query = f"INSERT INTO dbo.{table_name} ({', '.join(columns)}) VALUES ({placeholders})"
     db_cursor.executemany(sql_query, records)  #--> إدخال كل السجلات دفعة واحدة
     print(f"Loaded {table_name:<26}: {len(records):,} rows inserted.")
 
 
 def generate_dim_date(db_cursor):
-    """
-    بناء جدول التواريخ DimDate ديناميكياً
-    """
+   
     print("Generating DimDate calendar table dynamically")
     db_cursor.execute("DELETE FROM dbo.DimDate;")
     dim_date_sql = """
@@ -351,12 +338,12 @@ def main():
             for err in errors:
                 print(f" * {err}")
             db_connection.rollback()
-            print("Transaction rolled back.")
+            print("Transaction rolled back")
             sys.exit(1)
 
         print("All validations passed. Committing transaction")
         db_connection.commit()
-        print("ETL completed successfully.")
+        print("ETL completed successfully")
 
     except Exception as e:
         print(f"Runtime error during ETL: {e}")

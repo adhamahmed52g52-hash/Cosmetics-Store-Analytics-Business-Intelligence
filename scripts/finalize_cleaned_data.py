@@ -1,17 +1,3 @@
-"""
-finalize_cleaned_data.py
-------------------------------------------------------------------------------
-الهدف من السكربت:
-تنفيذ دورة معالجة وتنظيف وتصنيف البيانات الشاملة:
-1. تنظيف وتوحيد نصوص اللغة العربية وإزالة التشكيل والمسافات الزائدة.
-2. تصنيف الحسابات مع توثيق سبب التصنيف والدليل المحاسبي.
-3. تفعيل فلتر مبيعات التجزئة is_retail_sale واستبعاد الحركات غير التشغيلية.
-4. تطبيق التصنيف المزدوج للمنتجات (Product Scope & Product Category) بالكلمات الكاملة.
-5. حماية معادلات تكلفة الوحدة وهامش الربح من القسمة على صفر.
-6. فحص وتصنيف المرتجعات غير المربوطة مع توثيق الأسباب.
-7. تصدير ملفات الـ CSV النظيفة المتزامنة بين مجلدي data/processed و cleaned.
-"""
-
 import sys  #--> sys.exit() --> لإيقاف التنفيذ عند ظهور أي خطأ
 from pathlib import Path  #--> Path() --> للتعامل مع مسارات الملفات والمجلدات
 import re  #--> re --> لتنظيف النصوص واستبدال الأنماط
@@ -41,9 +27,7 @@ raw_accounts_df["acct_no"] = raw_accounts_df["acct_no"].astype(int)  #--> تحو
 raw_accounts_df["nature"] = raw_accounts_df["nature"].astype(str).str.strip()  #--> تنظيف نص طبيعة الحساب الأصلية
 
 def classify_account(row):
-    """
-    تصنيف الحساب وتوثيق السبب المحاسبي المعتمد
-    """
+    
     acct_name = row["acct_name"]
     nature_val = row["nature"]
     
@@ -358,9 +342,7 @@ raw_returns_invoices_df["total_discount"] = raw_returns_invoices_df["total_disco
 valid_sales_invoice_set = set(clean_sales_invoices_df["invoice_no"])
 
 def get_return_status(row):
-    """
-    تحديد حالة ربط المرتجع بالفاتورة الأصلية
-    """
+   
     orig_no = row["original_invoice_no"]
     if pd.isna(orig_no) or orig_no == 0:
         return "No original invoice referenced (source value 0)"

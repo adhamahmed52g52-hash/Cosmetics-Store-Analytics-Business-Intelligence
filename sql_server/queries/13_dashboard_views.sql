@@ -21,11 +21,11 @@ select
         when 5 then 6 -- Friday (الجمعة)
         when 6 then 7 -- Saturday (السبت)
     end as weekday_no,
-    count(distinct f.txn_date) as trading_days, --> عدد أيام التداول الفعلية في هذا اليوم
+    count(distinct case when f.line_type = N'Sale' then f.txn_date end) as trading_days, --> عدد أيام البيع الفعلية فقط (استبعاد أيام المرتجعات الخالصة)
     count(distinct case when f.line_type = N'Sale' then f.doc_no end) as invoices, --> حصر فواتير المبيعات الحقيقية فقط واستبعاد أرقام المرتجعات
     sum(f.revenue_signed) as net_sales, --> صافي المبيعات بعد خصم المرتجعات
     sum(f.profit_signed) as net_profit, --> صافي الأرباح بعد خصم المرتجعات
-    cast(sum(f.revenue_signed) * 1.0 / nullif(count(distinct f.txn_date), 0) as decimal(18, 2)) as sales_per_trading_day --> معدل المبيعات لكل يوم عمل
+    cast(sum(f.revenue_signed) * 1.0 / nullif(count(distinct case when f.line_type = N'Sale' then f.txn_date end), 0) as decimal(18, 2)) as sales_per_trading_day --> معدل المبيعات لكل يوم عمل بيع
 from dbo.vw_FactSalesLines f
 join dbo.DimDate d on d.full_date = f.txn_date
 where f.is_retail_sale = 1 --> التركيز على مبيعات التجزئة الحقيقية
@@ -65,8 +65,8 @@ select
     case --> تصنيف حالة المخزون
         when s.last_sale_date is null                            then 'Never sold' --> بضاعة راكدة لم يباع منها أي قطعة
         when s.last_sale_date <= dateadd(day, -90, ref.ref_date) then 'No sales 90d' --> لم تباع خلال آخر 90 يوماً
-        when p.total_qty > (s.units_last_90d / 3.0) * 12         then 'Overstock' --> مخزون فائض يتجاوز مبيعات سنة
-        when p.total_qty > (s.units_last_90d / 3.0) * 6          then 'Slow' --> مخزون بطيء الحركة يتجاوز مبيعات 6 أشهر
+        when p.total_qty > s.units_last_90d * 4                  then 'Overstock' --> مخزون فائض يتجاوز مبيعات سنة
+        when p.total_qty > s.units_last_90d * 2                  then 'Slow' --> مخزون بطيء الحركة يتجاوز مبيعات 6 أشهر
         else 'Healthy' --> مخزون نشط ومناسب لمعدل السحب
     end as stock_status
 from dbo.DimProduct p

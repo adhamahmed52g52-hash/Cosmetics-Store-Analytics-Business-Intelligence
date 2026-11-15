@@ -1,0 +1,10 @@
+﻿File Name,Rows,Columns,File Size (KB),Dataset Type,Candidate Business Key
+vw_FactSalesLines.csv,11048,13,1580.68,Transactional (Line-item grain),"doc_no, item_code"
+vw_InventoryHealth.csv,896,8,88.54,Snapshot (Product-level inventory health),item_code
+vw_KpiByCategory.csv,7,7,0.56,Aggregated (Category-level summary),product_category
+vw_KpiMonthly.csv,11,13,1.15,Aggregated (Monthly financial & KPI summary),year_month
+vw_ProductPerformance.csv,1234,11,144.84,Aggregated (Product-level sales & ABC classification),item_code
+vw_SalesByWeekday.csv,7,7,0.43,Aggregated (Day-of-week sales & profit summary),weekday_no
+vw_StockAvailabilityMonthly.csv,11,5,0.37,Aggregated (Monthly SKU catalog availability trend),year_month
+vw_StoreNetSalesSummary.csv,1,13,0.39,Reconciliation Snapshot (Single-row store total reconciliation),N/A (Single Row / Headerless)
+vw_TrafficTicketMonthly.csv,11,8,0.56,"Aggregated (Monthly traffic, tickets & basket dynamics)",year_month

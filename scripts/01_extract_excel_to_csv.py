@@ -1,11 +1,11 @@
 import sys  #--> sys.exit() --> لإيقاف تشغيل البرنامج عند حدوث خطأ جسيم
-from pathlib import Path  #--> Path() --> للتعامل مع مسارات الملفات والمجلدات بطريقة مرنة
-import numpy as np  #--> numpy --> للعمليات الحسابية ومقارنة الأرقام التقريبية
-import pandas as pd  #--> pandas --> لقراءة ومعالجة جداول البيانات DataFrames
+from pathlib import Path  #--> Path() -->   للتعامل مع مسارات الملفات والمجلدات بطريقة مرنة يتعامل  مع المسارات ك أوبجكت بدل نص  
+import numpy as np 
+import pandas as pd  
 from parse_utils import parse_transactions, parse_goods, parse_accounts, parse_returns  #--> دوال التحليل المخصصة
 
-# إعداد المسارات والمتغيرات العامة
-base_project_dir = Path(__file__).resolve().parent.parent  #--> المسار الجذري للمشروع
+
+base_project_dir = Path(__file__).resolve().parent.parent  #--> المسار الأصلي للمشروع
 source_excel_dir = base_project_dir.parent / "glossy for her"  #--> مسار مجلد ملفات الإكسيل الأصلية
 target_raw_csv_dir = base_project_dir / "data" / "raw"  #--> مسار مجلد تصدير ملفات الـ CSV الخام
 
@@ -22,27 +22,27 @@ text_columns_set = {"barcode", "mobile", "acct_code"}
 
 
 def sanitize_dataframe_for_sql(input_df: pd.DataFrame) -> pd.DataFrame:
-    """
-    تنظيف أنواع البيانات وإزالة الكسور العشرية الخاطئة من الباركود والأرقام الصحيحة
-    """
-    clean_df = input_df.copy()  #--> أخذ نسخة مستقلة لعدم التأثير على الجدول الأصلي
+    
+     #--> تنظيف أنواع البيانات وإزالة الكسور العشرية الخاطئة من الباركود والأرقام الصحيحة
+
+    clean_df = input_df.copy()  #--> نأخد نسخة مستقلة لعدم التأثير على الجدول الأصلي
     for col_name in clean_df.columns:
         if col_name in text_columns_set:
             #--> تحويل النص إلى String وإزالة أي .0 تظهر بالخطأ في الباركود
             clean_df[col_name] = (
                 clean_df[col_name]
-                .astype("string")
-                .str.replace(r"\.0$", "", regex=True)
+                .astype("string")#--> نوع النص إلي بيدعم القيم الفاضية 
+                .str.replace(r"\.0$", "", regex=True)  #-->  بنشيل.0 من أخر ارقم بس
             )
         elif col_name in integer_columns_set:
             #--> تحويل الأرقام إلى Int64 بأمان
             clean_df[col_name] = pd.to_numeric(
-                clean_df[col_name], errors="coerce"
-            ).astype("Int64")
+                clean_df[col_name], errors="coerce" #--> Nan أي قيمة مش رقم تبقا 
+            ).astype("Int64") # إلي بيقبل ال NULL
     return clean_df
 
 
-def run_extraction_pipeline():
+def run_extraction_pipeline(): 
     print("Step 1: Extracting raw POS Excel workbooks to flat CSV files")
     print(f"Source directory: {source_excel_dir}")
     print(f"Target directory: {target_raw_csv_dir}")

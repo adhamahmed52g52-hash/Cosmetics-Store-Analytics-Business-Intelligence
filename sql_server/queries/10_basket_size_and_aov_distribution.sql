@@ -5,7 +5,7 @@
 use cosmetics_store;
 go
 
--- 1) مقارنة إحصائية بين المتوسط الحسابي والوسيط والمئينات لقيم الفواتير ومكونات السلة
+-- 1) مقارنة إحصائية بين المتوسط الحسابي والوسيط  
 --------------------------------------------------------------------------------
 with OrderPercentileCalculations as ( --> CTE بنحسب فيه المئينات الإحصائية لقيم الفواتير
     select 
@@ -29,7 +29,7 @@ select distinct --> distinct لمنع تكرار نفس القيم الإحصا�
 from OrderPercentileCalculations;
 go
 
--- 2) توزيع فواتير المبيعات على شرائح الإنفاق المختلفة (Spend Brackets)
+-- 2) توزيع فواتير المبيعات (Spend Brackets)
 --------------------------------------------------------------------------------
 select 
     case 
@@ -38,7 +38,7 @@ select
         when final_total between 100 and 199.99 then '100 - 199 EGP' --> الشريحة الأساسية لمبيعات المحل
         when final_total between 200 and 499.99 then '200 - 499 EGP' --> فواتير مرتفعة القيمة
         when final_total between 500 and 999.99 then '500 - 999 EGP' --> فواتير عالية القيمة
-        else '1,000+ EGP (High-Value VIP Baskets)' --> فواتير كبرى وسلات شراء مميزة
+        else '1,000+ EGP (High-Value VIP Baskets)' --> فواتير مميزة
     end as [SpendBracket],
     count(invoice_no) as [OrdersCount], --> عدد الفواتير في الشريحة
     round(count(invoice_no) * 100.0 / (select count(*) from dbo.FactSalesInvoice where is_retail_sale = 1), 2) as [OrdersSharePct], --> نسبة الفواتير المئوية

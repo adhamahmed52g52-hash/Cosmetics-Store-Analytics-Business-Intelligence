@@ -5,7 +5,7 @@
 use cosmetics_store;
 go
 
--- 1. view خطوط المبيعات والمرتجع الموحدة (موجب للبيع وسالب للمرتجع)
+-- 1. view  المبيعات والمرتجع  
 --------------------------------------------------------------------------------
 if object_id('dbo.vw_FactSalesLines', 'V') is not null drop view dbo.vw_FactSalesLines;
 go
@@ -47,7 +47,7 @@ join dbo.FactSalesReturnInvoice ri on ri.return_invoice_no = r.return_invoice_no
 join dbo.DimProduct p on p.item_code = r.item_code;
 go
 
--- 2. view ملخص المصالحة المالية الشاملة للمتجر (Gross vs Retail Net Summary)
+-- 2. view  (Gross vs Retail Net Summary)
 --------------------------------------------------------------------------------
 if object_id('dbo.vw_StoreNetSalesSummary', 'V') is not null drop view dbo.vw_StoreNetSalesSummary;
 go
@@ -73,7 +73,7 @@ select
     (select count(*) from dbo.MissingInvoicesLog) as missing_invoice_gaps; --> عدد الفواتير المفقودة في التسلسل (26)
 go
 
--- 3. view مؤشرات الأداء والاتجاهات الشهرية لصافي مبيعات التجزئة (vw_KpiMonthly)
+-- 3. view صافي مبيعات التجزئة (vw_KpiMonthly)
 --------------------------------------------------------------------------------
 if object_id('dbo.vw_KpiMonthly', 'V') is not null drop view dbo.vw_KpiMonthly;
 go
@@ -125,7 +125,7 @@ left join r on r.year_month = m.year_month
 where s.year_month is not null or r.year_month is not null;
 go
 
--- 4. view مؤشرات أداء وهوامش الأقسام التجميلية (vw_KpiByCategory)
+-- 4. view مؤشرات الأقسام التجميلية (vw_KpiByCategory)
 --------------------------------------------------------------------------------
 if object_id('dbo.vw_KpiByCategory', 'V') is not null drop view dbo.vw_KpiByCategory;
 go
@@ -143,7 +143,7 @@ where f.is_retail_sale = 1
 group by f.product_category;
 go
 
--- 5. view تصنيف الأصناف حسب المساهمة في الإيراد ABC Pareto Analysis
+-- 5. view تصنيف الأصناف حسب المساهمة في الإيراد
 --------------------------------------------------------------------------------
 if object_id('dbo.vw_ProductPerformance', 'V') is not null drop view dbo.vw_ProductPerformance;
 go

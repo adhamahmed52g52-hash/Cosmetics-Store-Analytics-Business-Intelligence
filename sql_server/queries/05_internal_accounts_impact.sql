@@ -25,8 +25,8 @@ go
 -- 2) تدقيق تفصيلي للـ 24 فاتورة غير التشغيلية المستبعدة بقيمة 62,482 ج.م
 --------------------------------------------------------------------------------
 select 
-    s.sale_type as [NonRetailCategory], --> نوع الحركة المستبعدة
-    s.acct_no as [AccountNo], --> رقم الحساب في الدليل
+    s.sale_type as [NonRetailCategory], --> نوع العملية المستبعدة
+    s.acct_no as [AccountNo], --> رقم الحساب  
     isnull(a.acct_name, s.account_name) as [AccountName], --> اسم الحساب المسجل
     a.classification_rationale as [AuditRationale], --> توثيق سبب التصنيف والدليل المحاسبي للاستبعاد
     count(s.invoice_no) as [InvoicesCount], --> عدد الفواتير المستبعدة

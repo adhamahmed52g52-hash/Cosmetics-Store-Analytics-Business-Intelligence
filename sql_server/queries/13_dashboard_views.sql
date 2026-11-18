@@ -11,8 +11,8 @@ if object_id('dbo.vw_SalesByWeekday', 'V') is not null drop view dbo.vw_SalesByW
 go
 create view dbo.vw_SalesByWeekday as
 select
-    d.weekday_name, --> اسم يوم الأسبوع بالإنجليزية من التقويم المعتمد
-    case d.weekday_no --> ترتيب أيام الأسبوع وفقاً للتقويم المصري: الأحد (1) إلى السبت (7) ومستقل عن DATEFIRST واللغة
+    d.weekday_name,  
+    case d.weekday_no 
         when 7 then 1 -- Sunday (الأحد)
         when 1 then 2 -- Monday (الإثنين)
         when 2 then 3 -- Tuesday (الثلاثاء)
@@ -72,5 +72,5 @@ select
 from dbo.DimProduct p
 left join sales_summary s on p.item_code = s.item_code
 cross join ref
-where p.total_qty > 0; --> الأصناف ذات الرصيد الموجب المتوفرة للبيع
+where p.total_qty > 0; --> الأصناف ذات الرصيد الموجب 
 go

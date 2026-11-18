@@ -5,27 +5,27 @@
 use cosmetics_store;
 go
 
--- 1) تفكيك مؤشرات المبيعات شهرياً لمعادلة التجزئة: Sales = Traffic x Ticket
+-- 1)  مؤشرات المبيعات شهرياً لمعادلة التجزئة: Sales = Traffic x Ticket
 --------------------------------------------------------------------------------
 select 
     t.year_month as [YearMonth], --> صيغة الشهر والسنة
     t.trading_days as [TradingDays], --> عدد أيام العمل الفعلية في الشهر
     t.invoices as [TotalOrdersCount], --> إجمالي عدد فواتير التجزئة
-    t.invoices_per_day as [DailyTraffic_InvoicesPerDay], --> متوسط عدد الفواتير يومياً (مؤشر إقبال الزبائن Traffic)
-    t.avg_ticket as [AverageTicketValueEGP], --> متوسط قيمة الفاتورة AOV (مؤشر الإنفاق في الزيارة)
-    t.units_per_invoice as [AverageBasketUnits], --> متوسط عدد القطع في كل فاتورة (مؤشر حجم السلة Basket Size)
-    t.avg_unit_price as [AverageUnitPriceEGP], --> متوسط سعر بيع القطعة (مؤشر سياسة التسعير Pricing)
+    t.invoices_per_day as [DailyTraffic_InvoicesPerDay], --> متوسط عدد الفواتير يومياً 
+    t.avg_ticket as [AverageTicketValueEGP], --> متوسط قيمة الفاتورة 
+    t.units_per_invoice as [AverageBasketUnits], --> متوسط عدد القطع في كل فاتورة  
+    t.avg_unit_price as [AverageUnitPriceEGP], --> متوسط سعر بيع القطعة 
     t.distinct_products_sold as [DistinctSellingSKUs] --> عدد الأصناف المختلفة التي بيعت في الشهر
 from dbo.vw_TrafficTicketMonthly t
 order by t.year_month; --> ترتيب تسلسلي عبر الشهور
 go
 
--- 2) جدول المقارنة الرقابي بين شهر الذروة الأساسي (ديسمبر 2025) وشهر القاع (أغسطس 2026)
+-- 2) جدول المقارنة الرقابي بين شهر  (ديسمبر 2025)  (أغسطس 2026)
 --------------------------------------------------------------------------------
 select 
     [DiagnosticMetricName], --> اسم المؤشر التشخيصي
-    [Dec_2025_PeakValue], --> قيمة المؤشر في شهر الذروة (ديسمبر 2025)
-    [Aug_2026_TroughValue], --> قيمة المؤشر في شهر القاع (أغسطس 2026)
+    [Dec_2025_PeakValue], --> قيمة المؤشر في  (ديسمبر 2025)
+    [Aug_2026_TroughValue], --> قيمة المؤشر في (أغسطس 2026)
     [AbsoluteChangeValue], --> قيمة التغير المطلق
     [PercentageChangeRate] --> نسبة التغير المئوية (%)
 from (

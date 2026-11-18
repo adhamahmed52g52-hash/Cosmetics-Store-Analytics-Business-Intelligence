@@ -24,7 +24,7 @@ group by s.item_code, s.item_name, p.product_category
 order by TotalRevenue desc; --> الترتيب من الأكثر إيراداً
 go
 
--- 2) فحص البضاعة الراكدة التي لم يباع منها أي قطعة ولها رصيد بالمخزن (Dead Stock)
+-- 2)  (Dead Stock)
 --------------------------------------------------------------------------------
 with UnsoldStockItems as ( --> CTE بنصفي فيه الأصناف التي لم يدخل لها أي سطر بيع ولها رصيد موجب بالمخزن
     select 

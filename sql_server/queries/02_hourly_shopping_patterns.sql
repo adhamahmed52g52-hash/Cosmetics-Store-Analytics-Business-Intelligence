@@ -14,9 +14,9 @@ with HourlyRetailStats as ( --> CTE جدول مؤقت بنجمع فيه حركة
         sum(final_total) as [HourlyRevenue], --> إجمالي الإيراد المحقق في هذه الساعة
         avg(final_total) as [AvgOrderValue], --> متوسط قيمة الفاتورة في هذه الساعة
         case 
-            when order_hour between 20 and 23 then 'Evening Peak Shift (20:00 - 23:59)' --> شفت المساء وهو فترة الذروة القصوى للمحل
-            when order_hour between 0 and 3 then 'Midnight Shift Continuation (00:00 - 03:59)' --> فترة السهر بعد منتصف الليل
-            when order_hour between 12 and 19 then 'Daytime / Afternoon Shift (12:00 - 19:59)' --> شفت الظهيرة وفترة ما بعد الظهر
+            when order_hour between 20 and 23 then 'Evening Peak Shift (20:00 - 23:59)' --> شفت المساء 
+            when order_hour between 0 and 3 then 'Midnight Shift Continuation (00:00 - 03:59)' -->  منتصف الليل
+            when order_hour between 12 and 19 then 'Daytime / Afternoon Shift (12:00 - 19:59)' --> شفت الظهر وفترة ما بعد الظهر
             else 'Off-Hours / Morning' --> ساعات الصباح الباكر وقبل فتح المحل
         end as [ShiftSegment] --> تقسيم ساعات اليوم لشفتات تشغيلية
     from dbo.FactSalesInvoice

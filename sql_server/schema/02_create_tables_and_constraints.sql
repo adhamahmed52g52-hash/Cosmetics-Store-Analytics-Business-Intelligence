@@ -5,17 +5,17 @@
 use cosmetics_store;
 go
 
--- حذف الجداول الفرعية أولاً لتجنب تعارض قيود المفاتيح الأجنبية (FK Dependencies)
-if object_id('dbo.FactSalesReturnItem', 'U') is not null drop table dbo.FactSalesReturnItem;
-if object_id('dbo.FactSalesReturnInvoice', 'U') is not null drop table dbo.FactSalesReturnInvoice;
-if object_id('dbo.FactPurchaseItem', 'U') is not null drop table dbo.FactPurchaseItem;
-if object_id('dbo.FactPurchaseInvoice', 'U') is not null drop table dbo.FactPurchaseInvoice;
-if object_id('dbo.FactSalesItem', 'U') is not null drop table dbo.FactSalesItem;
-if object_id('dbo.FactSalesInvoice', 'U') is not null drop table dbo.FactSalesInvoice;
-if object_id('dbo.DimProduct', 'U') is not null drop table dbo.DimProduct;
-if object_id('dbo.DimAccount', 'U') is not null drop table dbo.DimAccount;
-if object_id('dbo.DimDate', 'U') is not null drop table dbo.DimDate;
-if object_id('dbo.MissingInvoicesLog', 'U') is not null drop table dbo.MissingInvoicesLog;
+-- حذف الجداول الفرعية أولاً     
+drop table if exists dbo.FactSalesReturnItem;
+drop table if exists dbo.FactSalesReturnInvoice;
+drop table if exists dbo.FactPurchaseItem;
+drop table if exists dbo.FactPurchaseInvoice;
+drop table if exists dbo.FactSalesItem;
+drop table if exists dbo.FactSalesInvoice;
+drop table if exists dbo.DimProduct;
+drop table if exists dbo.DimAccount;
+drop table if exists dbo.DimDate;
+drop table if exists dbo.MissingInvoicesLog;
 go
 
 -- =============================================================================
@@ -196,7 +196,7 @@ go
 -- 3.2 جدول بنود وتفاصيل فواتير المشتريات (FactPurchaseItem)
 --------------------------------------------------------------------------------
 create table dbo.FactPurchaseItem (
-    purchase_item_id int identity(1, 1) not null, --> ترقيم تسلسلي تلقائي فريد لكل سطر بند شراء
+    purchase_item_id int identity(1, 1) not null, --> ترقيم  تلقائي     
     invoice_no int not null, --> رقم فاتورة الشراء التابع لها البند
     invoice_row_index int null, --> ترتيب السطر في فاتورة الشراء
     item_code int not null, --> كود الصنف المورد
@@ -257,7 +257,7 @@ go
 -- 4.2 جدول بنود وتفاصيل فواتير مرتجع المبيعات (FactSalesReturnItem)
 --------------------------------------------------------------------------------
 create table dbo.FactSalesReturnItem (
-    return_item_id int identity(1, 1) not null, --> ترقيم تسلسلي تلقائي فريد لكل سطر بند مرتجع
+    return_item_id int identity(1, 1) not null, -->  ترقيم  تلقائي 
     return_invoice_no int not null, --> رقم فاتورة المرتجع التابع لها البند
     invoice_row_index int null, --> ترتيب السطر في فاتورة المرتجع
     item_code int not null, --> كود الصنف المرتجع

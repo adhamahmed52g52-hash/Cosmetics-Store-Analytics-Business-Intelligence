@@ -1,11 +1,12 @@
 -- *****************************************************************************
 -- 08_sales_returns_deepdive.sql
 -- *****************************************************************************
-
 use cosmetics_store;
 go
 
--- 1) مؤشر معدل الاسترداد المالي المعتمد لمرتجعات التجزئة (Return Rate KPI)
+
+
+-- 1)  (Return Rate KPI)
 --------------------------------------------------------------------------------
 select 
     (select sum(final_total) from dbo.FactSalesInvoice where is_retail_sale = 1) as [RetailGrossSales], --> إجمالي مبيعات التجزئة (915.7 ألف)
@@ -13,9 +14,9 @@ select
     (select sum(final_total) from dbo.FactSalesInvoice where is_retail_sale = 1)
         - (select abs(sum(final_total)) from dbo.FactSalesReturnInvoice where is_retail_sale = 1) as [RetailNetSales], --> صافي مبيعات التجزئة (901.9 ألف)
     round((select abs(sum(final_total)) from dbo.FactSalesReturnInvoice where is_retail_sale = 1) / 
-          nullif((select sum(final_total) from dbo.FactSalesInvoice where is_retail_sale = 1), 0) * 100.0, 2) as [AuditedRetailReturnRatePct], --> النسبة المعتمدة الصحيحة (1.50%)
+          nullif((select sum(final_total) from dbo.FactSalesInvoice where is_retail_sale = 1), 0) * 100.0, 2) as [AuditedRetailReturnRatePct], --> النسبة المعتمدة  (1.50%)
     round((select abs(sum(final_total)) from dbo.FactSalesReturnInvoice) / 
-          nullif((select sum(final_total) from dbo.FactSalesInvoice), 0) * 100.0, 2) as [UnfilteredBookReturnRatePct] --> النسبة المشوهة بدفاتر الحسابات (1.41%)
+          nullif((select sum(final_total) from dbo.FactSalesInvoice), 0) * 100.0, 2) as [UnfilteredBookReturnRatePct] --> النسبة  بدفاتر الحسابات (1.41%)
 ;
 go
 
@@ -32,7 +33,6 @@ group by r.original_invoice_status
 order by [ReturnsCount] desc;
 go
 
--- فحص تفصيلي للمرتجعات الأربعة غير المربوطة لتوضيح أسبابها في المناقشة
 select 
     r.return_invoice_no as [ReturnInvoiceNo], --> رقم إشعار المرتجع
     r.return_date as [ReturnDate], --> تاريخ المرتجع
